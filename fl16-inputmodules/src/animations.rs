@@ -71,15 +71,21 @@ impl Iterator for ZigZagIterator {
 }
 
 pub struct StartupPercentageIterator {
-    frames: usize,
-    current_frame: usize,
+    current_lines: usize,
+    frames_remaining_startup: usize,
+    frames_remaining_fade: usize,
+    fade_total_frames: usize,
+    speed_factor: usize
 }
 
 impl Default for StartupPercentageIterator {
     fn default() -> Self {
         Self {
-            frames: 34,
-            current_frame: 0,
+            current_lines: 0,
+            frames_remaining_startup: 10 * 34,
+            frames_remaining_fade: 80,
+            fade_total_frames: 80,
+            speed_factor: 10
         }
     }
 }
@@ -88,9 +94,29 @@ impl Iterator for StartupPercentageIterator {
     type Item = Grid;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.current_frame < self.frames {
-            self.current_frame += 1;
-            Some(rows(self.current_frame))
+        if self.frames_remaining_startup > 0 {
+            if self.frames_remaining_startup % self.speed_factor == 0 {
+                self.current_lines += 1;
+            }
+
+            self.frames_remaining_startup -= 1;
+            
+            Some(rows(self.current_lines))
+        } else if self.frames_remaining_fade > 0 {
+            let mut grid = Grid::default();
+
+            let current_brightness: usize;
+            current_brightness = self.frames_remaining_fade * 255 / self.fade_total_frames as usize;
+
+            for y in 0..HEIGHT {
+                for x in 0..WIDTH {
+                    grid.0[x][y] = current_brightness as u8;
+                }
+            }
+
+            self.frames_remaining_fade -= 1;
+
+            Some(grid)
         } else {
             None
         }

@@ -244,20 +244,21 @@ fn main() -> ! {
     };
     state.debug_mode = dip1.is_low().unwrap();
     if show_startup_animation(&state) {
-        state.upcoming_frames = Some(match get_random_byte(&rosc) % 8 {
-            0 => Animation::Percentage(StartupPercentageIterator::default()),
-            1 => Animation::ZigZag(ZigZagIterator::default()),
-            2 => Animation::Gof(GameOfLifeIterator::new(GameOfLifeStartParam::Pattern1, 200)),
-            3 => Animation::Gof(GameOfLifeIterator::new(
-                GameOfLifeStartParam::BeaconToadBlinker,
-                128,
-            )),
-            4 => Animation::Gof(GameOfLifeIterator::new(GameOfLifeStartParam::Glider, 128)),
-            5 => Animation::Breathing(BreathingIterator::default()),
-            6 => Animation::Pong(PongIterator::default()),
-            7 => Animation::Snake(SnakeIterator::default()),
-            _ => unreachable!(),
-        });
+        state.upcoming_frames = Some(Animation::Percentage(StartupPercentageIterator::default()));
+        // state.upcoming_frames = Some(match get_random_byte(&rosc) % 8 {
+        //     0 => Animation::Percentage(StartupPercentageIterator::default()),
+        //     1 => Animation::ZigZag(ZigZagIterator::default()),
+        //     2 => Animation::Gof(GameOfLifeIterator::new(GameOfLifeStartParam::Pattern1, 200)),
+        //     3 => Animation::Gof(GameOfLifeIterator::new(
+        //         GameOfLifeStartParam::BeaconToadBlinker,
+        //         128,
+        //     )),
+        //     4 => Animation::Gof(GameOfLifeIterator::new(GameOfLifeStartParam::Glider, 128)),
+        //     5 => Animation::Breathing(BreathingIterator::default()),
+        //     6 => Animation::Pong(PongIterator::default()),
+        //     7 => Animation::Snake(SnakeIterator::default()),
+        //     _ => unreachable!(),
+        // });
     } else {
         // If no startup animation, keep display always on
         state.grid = percentage(100);
